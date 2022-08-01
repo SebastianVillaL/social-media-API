@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body #Allows to extract data from the Body of a POST Request
 from pydantic import BaseModel
 from typing import Optional
@@ -21,6 +21,11 @@ def find_post(id):
 	for p in my_posts:
 		if p["id"] == int(id):
 			return p
+#just a function to find the index on the list
+def find_index_post(id):
+	for index, item in enumerate(my_posts):
+		if item['id'] == id:
+			return index
 
 @app.get("/")
 async def root():
@@ -33,7 +38,8 @@ async def root():
 def get_posts():
 	return {"data": my_posts}
 
-@app.post("/posts")
+
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
 #This receives the Body of a POST request, then stores on variable post
 def create_posts(post: Post):
 	post_dict = post.dict()
@@ -41,8 +47,33 @@ def create_posts(post: Post):
 	my_posts.append(post_dict)
 	return {"data": my_posts}
 
+
 @app.get("/posts/{id}") #the {id} is a 'path parameter', fastAPI will extract the id(as a str)
-def get_post(id: int):
+def get_post(id: int, response: Response):
 	post = find_post(id)
+	if not post:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+							detail=f'post with id {id} was not found')
 	return {"post_detail": post}
-	
+
+
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int): #deleting post (for now on a list)
+	index = find_index_post(id)
+	if index == None:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+			  				detail=f"post with id: {id} does not exist")
+	my_posts.pop(index)
+	return {'message': 'Post was succesfully deleted'} 
+
+
+@app.put("/posts/{id}")
+def update_post(id: int, post: Post):
+	index = find_index_post(id)
+	if index == None:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+			  				detail=f"post with id: {id} does not exist")
+	post_dict = post.dict()
+	post_dict['id'] = id
+	my_posts[index] = post_dict
+	return {'data': post_dict}
