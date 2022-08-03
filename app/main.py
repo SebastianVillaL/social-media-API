@@ -3,14 +3,30 @@ from fastapi.params import Body #Allows to extract data from the Body of a POST 
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import time
 
-app = FastAPI()
+app = FastAPI() #Instance of FastAPI saved in the variable app
 
 class Post(BaseModel): #This is a schema(to format our posts with the following criteria"
 	title: str
 	content: str
 	published: bool = True
 	rating: Optional[int] = None
+
+
+while True:
+	try:
+		conn = psycopg2.connect(host='localhost', database='fastapi', 
+								user='postgres', password='root', cursor_factory=RealDictCursor)
+		cursor = conn.cursor()
+		print("Database connection was succesfull!")
+		break
+	except Exception as error:
+		print("Connecting to database failed")
+		print("Error: ", error)
+		time.sleep(10)
 	
 #This is just to store the posts as dictionaries on a list, no database yet	
 my_posts = [{'title': 'title of post 1', 'content': 'content of post 1', 'id': 1},
@@ -28,7 +44,7 @@ def find_index_post(id):
 			return index
 
 @app.get("/")
-async def root():
+async def home():
 	return {"message": "Welcome to my API"}
 
 
