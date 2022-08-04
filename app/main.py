@@ -1,11 +1,22 @@
-from fastapi import FastAPI, Response, status, HTTPException
-from fastapi.params import Body #Allows to extract data from the Body of a POST Request
-from pydantic import BaseModel
+#Python
 from typing import Optional
-from random import randrange
+import time
+#Pydantic
+from pydantic import BaseModel
+#Fastapi
+from fastapi import FastAPI, Response, status, HTTPException, Depends
+from fastapi.params import Body #Allows to extract data from the Body of a POST Request
+#Psycopg2
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import time
+#SQLAlchemy
+from sqlalchemy.orm import Session
+#Project files
+from . import models
+from .database import engine, get_db
+
+#This command creates all the tables based on the models on the models.py file
+models.Base.metadata.create_all(bind=engine)
 
 
 class Post(BaseModel): #This is a schema(to format our posts with the following criteria)
@@ -36,8 +47,12 @@ async def home():
 	return {"message": "Welcome to my API"}
 
 
-#Here starts the posts CRUD operations
+@app.get("/sqlalchemy")
+def test_posts(db: Session = Depends(get_db)):
+	return {"status": "Success"}
 
+
+#Here starts the posts CRUD operations
 @app.get("/posts")
 def get_posts():
 
