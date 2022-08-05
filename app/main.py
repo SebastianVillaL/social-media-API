@@ -41,15 +41,15 @@ async def home():
 	return {"message": "Welcome to my API"}
 
 
-#Here starts the posts CRUD operations
-@app.get("/posts", response_model=List[schemas.Post])
+#Here starts the CRUD operations for the social media posts
+@app.get("/posts", response_model=List[schemas.PostOut])
 def get_posts(db: Session = Depends(get_db)):
 	posts = db.query(models.Post).all()
 	return posts
 
 
 #This receives the Body of a POST request, validates it using the schema.Post then stores on variable post
-@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
 def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
 
 	new_post = models.Post(**post.dict()) # -> ** <- This unpacks the dictionary
@@ -60,7 +60,7 @@ def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
 	return new_post #Using the response_model FastAPI will convert this to JSON automatically
 
 
-@app.get("/posts/{id}", response_model=schemas.Post) #the {id} is a 'path parameter', fastAPI will extract the id(as a str)
+@app.get("/posts/{id}", response_model=schemas.PostOut) #the {id} is a 'path parameter', fastAPI will extract the id(as a str)
 def get_post(id: int, response: Response, db: Session = Depends(get_db)):
 
 	post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -85,7 +85,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 	return {'message: Post was succesfully deleted'} 
 
 
-@app.put("/posts/{id}", response_model=schemas.Post)
+@app.put("/posts/{id}", response_model=schemas.PostOut)
 def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db)):
 
 	post_query = db.query(models.Post).filter(models.Post.id == id)
@@ -96,3 +96,16 @@ def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db)):
 	post_query.update(post.dict(), synchronize_session=False)
 	db.commit()
 	return post_query.first()
+
+
+
+#Here starts the CRUD operations for the users 
+@app.post("/registration", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+def create_user(user: schemas.User, db: Session = Depends(get_db)):
+	
+	new_user = models.User(**user.dict())
+	db.add(new_user)
+	db.commit()
+	db.refresh(new_user)
+
+	return new_user
