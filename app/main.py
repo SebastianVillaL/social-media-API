@@ -12,17 +12,11 @@ from psycopg2.extras import RealDictCursor
 #SQLAlchemy
 from sqlalchemy.orm import Session
 #Project files
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 
 #This command creates all the tables based on the models on the models.py file
 models.Base.metadata.create_all(bind=engine)
-
-
-class Post(BaseModel): #This is a schema(to format our posts with the following criteria)
-	title: str
-	content: str
-	published: bool = True
 
 
 #This is to set a connection to the fastapi database on the postgres server
@@ -56,7 +50,7 @@ def get_posts(db: Session = Depends(get_db)):
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 #This receives the Body of a POST request, then stores on variable post
-def create_posts(post: Post, db: Session = Depends(get_db)):
+def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
 	new_post = models.Post(**post.dict()) # -> ** <- This unpacks the dictionary
 	db.add(new_post)
 	db.commit()
@@ -90,7 +84,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/posts/{id}")
-def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db)):
 
 	post_query = db.query(models.Post).filter(models.Post.id == id)
 	if post_query.first() == None:
