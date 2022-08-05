@@ -4,3 +4,6 @@ class Post(BaseModel): #This is a schema(to format our posts with the following 
 	title: str
 	content: str
 	published: bool = True
+
+	class Config:
+		orm_mode = True
