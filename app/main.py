@@ -65,8 +65,8 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
 
     if not post:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                                    detail=f'post with id {id} was not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f'post with id {id} was not found')
     return post
 
 
@@ -76,8 +76,8 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
     if post_query.first() == None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                                    detail=f'post with id {id} does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f'post with id {id} does not exist')
 
     post_query.delete(synchronize_session=False)
     db.commit()
@@ -89,8 +89,8 @@ def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
     if post_query.first() == None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                                    detail=f"post with id: {id} does not exist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with id: {id} does not exist")
 
     post_query.update(post.dict(), synchronize_session=False)
     db.commit()
@@ -111,3 +111,13 @@ def create_user(user: schemas.User, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
+@app.get("/users/{id}", response_model=schemas.UserOut)
+def get_user(id: int, db: Session = Depends(get_db)):
+
+    user = db.query(models.User).filter(models.User.id == id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f'user with id {id} was not found')
+    return user
