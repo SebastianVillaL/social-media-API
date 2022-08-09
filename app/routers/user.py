@@ -6,19 +6,22 @@ from fastapi.params import Body #Allows to extract data from the Body of a POST 
 #SQLAlchemy
 from sqlalchemy.orm import Session
 #Project files
-from .. import models, schemas
+from .. import models, schemas, utils
 from ..database import get_db
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=['Users']
+)
+
 
 
 #Here starts the CRUD operations for the users
-@router.post("/registration", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(user: schemas.User, db: Session = Depends(get_db)):
-
     #Hash password
-    user.password = hash(user.password)
+    user.password = utils.hash(user.password)
 
     new_user = models.User(**user.dict())
     db.add(new_user)
@@ -27,7 +30,7 @@ def create_user(user: schemas.User, db: Session = Depends(get_db)):
 
     return new_user
 
-@router.get("/users/{id}", response_model=schemas.UserOut)
+@router.get("/{id}", response_model=schemas.UserOut)
 def get_user(id: int, db: Session = Depends(get_db)):
 
     user = db.query(models.User).filter(models.User.id == id).first()

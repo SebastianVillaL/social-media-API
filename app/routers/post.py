@@ -10,18 +10,21 @@ from .. import models, schemas
 from ..database import get_db
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/posts",
+    tags=['Posts']
+)
 
 
 #Here starts the CRUD operations for the social media posts
-@router.get("/posts", response_model=List[schemas.PostOut])
+@router.get("/", response_model=List[schemas.PostOut])
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     return posts
 
 
 #This receives the Body of a POST request, validates it using the schema.Post then stores on variable post
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
 def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
 
     new_post = models.Post(**post.dict()) # -> ** <- This unpacks the dictionary
@@ -32,7 +35,7 @@ def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
     return new_post #Using the response_model FastAPI will convert this to JSON automatically
 
 
-@router.get("/posts/{id}", response_model=schemas.PostOut) #the {id} is a 'path parameter', fastAPI will extract the id(as a str)
+@router.get("/{id}", response_model=schemas.PostOut) #the {id} is a 'path parameter', fastAPI will extract the id(as a str)
 def get_post(id: int, response: Response, db: Session = Depends(get_db)):
 
     post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -43,7 +46,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
     return post
 
 
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
@@ -57,7 +60,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return {'message: Post was succesfully deleted'}
 
 
-@router.put("/posts/{id}", response_model=schemas.PostOut)
+@router.put("/{id}", response_model=schemas.PostOut)
 def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
