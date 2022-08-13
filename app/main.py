@@ -23,7 +23,7 @@ models.Base.metadata.create_all(bind=engine)
 while True:
     try:
         #conn represents the connection to the database
-        conn = psycopg2.connect(host='localhost', database='fastapi', 
+        conn = psycopg2.connect(host='localhost', database='fastapi',
                                 user='postgres', password='root', cursor_factory=RealDictCursor)
         cursor = conn.cursor()
         print("Database connection was succesfull!")
@@ -32,7 +32,7 @@ while True:
         print("Connecting to database failed")
         print("Error: ", error)
         time.sleep(10)
-	
+
 #Instance of FastAPI saved in the variable app
 app = FastAPI()
 #This will get the router object from the .routers folder
