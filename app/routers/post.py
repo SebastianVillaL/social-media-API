@@ -26,7 +26,7 @@ def get_posts(db: Session = Depends(get_db)):
 #This receives the Body of a POST request, validates it using the schema.Post then stores on variable post
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
 def create_posts(post: schemas.Post, db: Session = Depends(get_db),
-                 user_id :int = Depends(oauth2.get_current_user)):
+                 current_user :int = Depends(oauth2.get_current_user)):
 
     new_post = models.Post(**post.dict()) # -> ** <- This unpacks the dictionary
     db.add(new_post)
@@ -49,7 +49,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db),
-                user_id :int = Depends(oauth2.get_current_user)):
+                current_user :int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
@@ -64,7 +64,7 @@ def delete_post(id: int, db: Session = Depends(get_db),
 
 @router.put("/{id}", response_model=schemas.PostOut)
 def update_post(id: int, post: schemas.Post, db: Session = Depends(get_db),
-                user_id :int = Depends(oauth2.get_current_user)):
+                current_user :int = Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
     if post_query.first() == None:
