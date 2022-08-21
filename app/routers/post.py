@@ -23,6 +23,14 @@ def get_posts(db: Session = Depends(get_db)):
     return posts
 
 
+@router.get("/myposts", response_model=List[schemas.PostOut])
+def get_my_posts(db: Session = Depends(get_db),
+                 current_user: int = Depends(oauth2.get_current_user)):
+
+    my_posts = db.query(models.Post).filter(models.Post.user_id == current_user.id).all()
+    return my_posts
+
+
 #This receives the Body of a POST request, validates it using the schema.Post then stores on variable post
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostOut)
 def create_posts(post: schemas.Post, db: Session = Depends(get_db),
