@@ -1,5 +1,6 @@
 #Here are the models, every model represents a table in the database
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.expression import text
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from .database import Base
@@ -15,6 +16,7 @@ class Post(Base):
                  nullable=False, server_default=text('now()'))
     user_id = Column(Integer,
                      ForeignKey("users.id",ondelete="CASCADE"), nullable=False)
+    user = relationship("User") #This figures out the relationship in the db based on the foreing key set up above for user_id
 
 
 class User(Base):

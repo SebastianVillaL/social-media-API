@@ -4,18 +4,6 @@ from datetime import datetime
 #Pydantic
 from pydantic import BaseModel, EmailStr
 
-class Post(BaseModel): #This is a schema(to format our posts with the following criteria)
-    title: str
-    content: str
-    published: bool = True
-    class Config:
-        orm_mode = True
-
-class PostOut(Post):
-    id: int
-    created_at: datetime
-    user_id: int
-
 
 class User(BaseModel): #This is a schema(to format our users with the following criteria)
     email: EmailStr
@@ -28,10 +16,23 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
-
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+
+class Post(BaseModel): #This is a schema(to format our posts with the following criteria)
+    title: str
+    content: str
+    published: bool = True
+    class Config:
+        orm_mode = True
+
+class PostOut(Post):
+    id: int
+    created_at: datetime
+    user_id: int
+    user: UserOut
 
 
 class Token(BaseModel):
