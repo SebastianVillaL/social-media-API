@@ -24,7 +24,8 @@ while True:
     try:
         #conn represents the connection to the database
         conn = psycopg2.connect(host='localhost', database='fastapi',
-                                user='postgres', password='root', cursor_factory=RealDictCursor)
+                                user='postgres', password='root',
+                                cursor_factory=RealDictCursor)
         cursor = conn.cursor()
         print("Database connection was succesfull!")
         break

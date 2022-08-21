@@ -11,16 +11,15 @@ class Post(BaseModel): #This is a schema(to format our posts with the following 
     class Config:
         orm_mode = True
 
-
 class PostOut(Post):
     id: int
     created_at: datetime
+    user_id: int
 
 
 class User(BaseModel): #This is a schema(to format our users with the following criteria)
     email: EmailStr
     password: str
-
 
 class UserOut(BaseModel):
     id: int
@@ -29,9 +28,11 @@ class UserOut(BaseModel):
     class Config:
         orm_mode = True
 
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
 
 class Token(BaseModel):
     access_token: str
