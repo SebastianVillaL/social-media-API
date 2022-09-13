@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 #Pydantic
 from pydantic import BaseModel, EmailStr
+from pydantic.types import conint
 
 
 class User(BaseModel): #This is a schema(to format our users with the following criteria)
@@ -41,3 +42,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(ge=0, le=1)

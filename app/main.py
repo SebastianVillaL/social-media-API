@@ -3,7 +3,7 @@ from fastapi import FastAPI
 #Project files
 from . import models
 from .database import engine
-from .routers import post, user, auth
+from .routers import post, user, auth, vote
 
 
 #This command creates all the tables based on the models on the models.py file
@@ -16,6 +16,7 @@ app = FastAPI()
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(vote.router)
 
 
 #This is the home of the API
